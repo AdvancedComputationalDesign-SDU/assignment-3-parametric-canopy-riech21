@@ -61,28 +61,17 @@
 
 ## Technical Explanation
 
-*(Provide a concise explanation of your code, focusing on how you implemented depth map manipulation, recursive geometry generation, and surface tessellation in Grasshopper Python. Discuss how your approach generates the final structural canopy and the mathematical principles involved.)*
+**Depth Map Generation**
+The depth map modifies the base surface by applying sine and cosine variations to the Z-coordinate, creating a wavy, dynamic effect. The `depth_map` function computes the depth, where x and y are parametric coordinates of the surface. This wave-like pattern is controlled by the surface domain and grid resolution (`u`, `v` divisions), allowing for precise manipulation of the undulations. The mathematical principles involve trigonometric functions, which introduce periodicity.
 
-### Topics to Cover:
+**Surface Tessellation**
+The tessellation divides the depth-modified surface into a mesh of triangular faces. A grid of points is created by evaluating the surface at uniform parametric intervals and adjusting the Z-values with the depth map. For each grid cell, two triangles are defined to form a quad. This method ensures continuity across the surface and adaptability to non-uniform grids. The resulting tessellation serves as a base for integrating supports.
 
-- **Depth Map Generation**
-  - Explain how you manipulated the surface geometry.
-  - Discuss the mathematical functions used (e.g., sine, cosine).
-  - Describe how control parameters affect the depth variations.
+**Recursive Supports Generation**
+The recursive `grow` function generates tree-like support structures. Starting from selected points from the tessellated surface, branches are grown iteratively. Each branch is defined by rotating the growth vector around a randomly chosen axis within a local plane. The recursion depth (`gen`) and branch rotation angle (`angle`) control the complexity and spread of the fractal structure. This approach mimics natural branching patterns.
 
-- **Surface Tessellation**
-  - Describe the tessellation strategies implemented.
-  - Explain how tessellation contributes to the canopy design.
-  - Discuss any algorithms or techniques used for non-uniform tessellation.
-
-- **Recursive Supports Generation**
-  - Explain how recursion was used to create complex support structures.
-  - Discuss the parameters that control the recursion (e.g., depth, angle).
-  - Describe how branching patterns were achieved.
-
-- **Combining Geometries**
-  - Explain the methods used to integrate the shell and supports.
-  - Discuss any challenges in merging different geometries.
+**Combining Geometries**
+The canopy shell and recursive supports are integrated by projecting grid points onto the base surface and anchoring tree roots at selected locations. The smooth blending of tessellation and recursive geometry ensures structural continuity. Challenges include maintaining alignment and selecting anchoring points randomly.
 
 ---
 
