@@ -188,22 +188,9 @@ The canopy shell and recursive supports are integrated by projecting grid points
 
 ## References
 
-*(List any resources you used or found helpful during the assignment.)*
-
-- **Python for CAD Applications**:
-  - Rhino.Python Guides
-  - RhinoScriptSyntax Documentation
-
-- **Grasshopper and GhPython**:
-  - Grasshopper Primer
-  - GhPython Tutorials
-
-- **Mathematical Functions and Recursion**:
-  - Python Math Module
-  - Recursion in Python Tutorials
-
-- **Surface Tessellation Techniques**:
-  - Voronoi Diagrams
-  - Delaunay Triangulation
+- Grasshopper Scripting: [Grasshopper Scripting: Python](https://developer.rhino3d.com/guides/scripting/scripting-gh-python/)
+- Rhino.Python: [What is Rhino.Python?](https://developer.rhino3d.com/guides/rhinopython/what-is-rhinopython/)
+- GhPython: [Mathematical Notation](https://parametrichouse.com/ghpython/)
+- NURBS-Python: [Tessellation](https://nurbs-python.readthedocs.io/en/5.x/module_tessellate.html)
 
 ---
