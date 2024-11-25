@@ -12,50 +12,63 @@
 
 ## Pseudo-Code
 
-*(Provide detailed pseudo-code explaining the logic of your program. Outline your functions for depth map generation, recursive geometry, and tessellation, and how they contribute to the final structural canopy.)*
+1. **Main Function: Generate Fractal Canopy with Recursive Growth**
 
-### Example Structure:
+- **Inputs**
+  - `srf`: The base surface for the canopy.
+  - `u, v`: Number of divisions along the U and V directions.
+  - `gen`: Maximum recursion depth for tree growth.
+  - `length`: Initial branch length for trees.
+  - `angle`: Maximum rotation angle for branch growth.
+  - `s`: Random seed for consistent results.
 
-1. **Main Function: Generating the Canopy**
-
-   - **Inputs**:
-     - `base_surface`: The initial surface for the canopy.
-     - `depth_map_control`: Control parameter for depth variation.
-     - `recursion_params`: Parameters for recursive supports.
-     - `tessellation_strategy`: Strategy for surface tessellation.
-     - `support_points`: Points where supports will be generated.
-
-   - **Process**:
-     - **Generate Depth Map**:
-       - Modify `base_surface` using a control function.
-     - **Tessellate Surface**:
-       - Divide the modified surface into panels.
-     - **Generate Vertical Supports**:
-       - Create supports using recursive geometry.
-
-   - **Outputs**:
-     - `canopy_mesh`: The tessellated canopy shell.
-     - `supports`: The vertical support structures.
+- **Process**
+  - **Generate Depth Map**
+    - Apply a sine depth variation to the surface points.
+  - **Tessellate Surface**
+    - Create a grid of points on the modified surface.
+    - Generate polylines along the U and V directions.
+    - Create a surface from the adjusted grid of points.
+  - **Recursive Tree Growth**
+    - Select random starting points from the surface grid.
+    - Use a recursive function to grow fractal tree structures from each point.
+  - **Create Tessellation Mesh**
+    - Define triangular faces using the grid points.
+    - Generate a tessellated mesh for the canopy structure.
+  - **Outputs**
+    - `tessellation_mesh`: The tessellated canopy surface.
+    - `lines`: The recursive tree structures.
 
 2. **Functions**
 
-   - **`generate_depth_map(surface, control_value)`**
-     - *Purpose*: Modify the input surface to create depth variations.
-     - *Implementation Details*:
-       - Use mathematical functions to adjust control points.
-       - Explore different methods for depth manipulation.
+- **`depth_map(x, y)`**
+  - *Purpose*: Calculate depth variation using a sine pattern.
+  - *Implementation Details*:
+    - Compute depth using `2 * sin(2πx) * cos(2πy)`.
+    - Return the depth value.
 
-   - **`tessellate_surface(surface, strategy)`**
-     - *Purpose*: Tessellate the surface based on the chosen strategy.
-     - *Implementation Details*:
-       - Implement grid-based, triangular, Voronoi, or other tessellation algorithms.
-       - Ensure non-uniformity in the tessellation pattern.
+- **`grow(pt, vec, length, g)`**
+  - *Purpose*: Recursively generate tree branches.
+  - *Implementation Details*:
+    - Stop recursion if `g` exceeds `gen`.
+    - Generate random rotation axes and angles.
+    - Compute endpoints for two branches.
+    - Add smooth curves between `pt` and each endpoint.
+    - Call `grow` for each branch endpoint with reduced `length` and incremented `g`.
 
-   - **`generate_recursive_supports(start_point, params, depth)`**
-     - *Purpose*: Generate branching structures for supports.
-     - *Implementation Details*:
-       - Use recursion to create complex geometries.
-       - Control recursion with parameters like `max_depth` and `angle`.
+2. **Execution Flow**
+
+- **Setup**
+  - Define base surface, parameters (u, v, gen, length, etc.)
+- **Generate Surface Grid**
+  - Call `depth_map` to modify Z-coordinates.
+  - Create grid, polylines, and adjusted surface.
+- **Grow Trees**
+  - Select random starting points.
+  - For each point, call `grow` recursively to create fractal trees.
+- **Tessellate and Mesh**
+  - Create triangular tessellation from the grid points.
+  - Generate a mesh representing the canopy structure.
 
 ---
 
