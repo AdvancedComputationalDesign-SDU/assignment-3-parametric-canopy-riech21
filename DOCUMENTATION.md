@@ -124,18 +124,20 @@ The canopy shell and recursive supports are integrated by projecting grid points
 
 ## Challenges and Solutions
 
-*(Discuss any challenges you faced during the assignment and how you overcame them.)*
+- **Challenge**: Adapting scripts to Grasshopper.
+  - **Solution**: Integrating Python-based geometry into Grasshopper's parametric workflow was initially challenging due to Grasshopper's reliance on Rhino.Geometry. To overcome this, I studied RhinoScript and utilized Grasshopper's tree structures, such as using `ghpythonlib.treehelpers.list_to_tree` to convert Python lists into data trees for tessellation and surface point manipulation
 
-### Examples:
+- **Challenge**: Managing data structures.
+  - **Solution**: Defining growth points for recursive tree structures was challenging due to misalignment between Grasshopper's data trees and Python's standard lists. Maintaining grid integrity during operations like depth mapping and tree projection was difficult. I solved this by flattening grids when needed and restructuring them with clear indexing to preserve the relationship between points and their positions.
 
-- **Challenge 1**: Adapting scripts to Grasshopper.
-  - **Solution**: Describe how you addressed this challenge, such as learning the Rhino.Geometry module or adjusting data types.
+- **Challenge**: Defining Starting Points for Tree Growth.
+  - **Solution**: Determining starting points for the tree structures was challenging. Growing trees directly from points on the tessellated mesh caused alignment issues and difficulty integrating the canopy. The solution was projecting the starting points onto the construction plane (C-plane), which provided a more structured, uniform distribution and allowed the trees to better support the canopy.
 
-- **Challenge 2**: Managing data structures.
-  - **Solution**: Explain the strategies you used to handle lists and trees in Grasshopper.
+- **Challenge**: Generating a Smooth Canopy Surface.
+  - **Solution**: The tessellated mesh from the modified grid sometimes produced sharp edges and mismatched vertices, causing visual and structural issues in the canopy. This resulted from irregular point offsets in the depth map. To fix this, I aligned grid points, interpolated between rows and columns for continuity, and added a vertical offset to create a consistent canopy shell.
 
-- **Challenge 3**: Performance optimization.
-  - **Solution**: Discuss how you optimized your code to run efficiently.
+- **Challenge**: Generating Curvy Branches
+  - **Solution**: Ensuring realistic branching patterns required balancing concave and convex shapes through control points. Inconsistent control point placement often resulted in unnatural curves. By dynamically calculating intermediate control points based on branch endpoint differences, I created smooth curves for both concave and convex branches.
 
 ---
 
