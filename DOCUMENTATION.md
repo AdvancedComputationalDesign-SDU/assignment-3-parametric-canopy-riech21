@@ -12,151 +12,185 @@
 
 ## Pseudo-Code
 
-*(Provide detailed pseudo-code explaining the logic of your program. Outline your functions for depth map generation, recursive geometry, and tessellation, and how they contribute to the final structural canopy.)*
+1. **Main Function: Generate Fractal Canopy with Recursive Growth**
 
-### Example Structure:
+- **Inputs**
+  - `srf`: The base surface for the canopy.
+  - `u, v`: Number of divisions along the U and V directions.
+  - `gen`: Maximum recursion depth for tree growth.
+  - `length`: Initial branch length for trees.
+  - `angle`: Maximum rotation angle for branch growth.
+  - `s`: Random seed for consistent results.
 
-1. **Main Function: Generating the Canopy**
-
-   - **Inputs**:
-     - `base_surface`: The initial surface for the canopy.
-     - `depth_map_control`: Control parameter for depth variation.
-     - `recursion_params`: Parameters for recursive supports.
-     - `tessellation_strategy`: Strategy for surface tessellation.
-     - `support_points`: Points where supports will be generated.
-
-   - **Process**:
-     - **Generate Depth Map**:
-       - Modify `base_surface` using a control function.
-     - **Tessellate Surface**:
-       - Divide the modified surface into panels.
-     - **Generate Vertical Supports**:
-       - Create supports using recursive geometry.
-
-   - **Outputs**:
-     - `canopy_mesh`: The tessellated canopy shell.
-     - `supports`: The vertical support structures.
+- **Process**
+  - **Generate Depth Map**
+    - Apply a sine depth variation to the surface points.
+  - **Tessellate Surface**
+    - Create a grid of points on the modified surface.
+    - Generate polylines along the U and V directions.
+    - Create a surface from the adjusted grid of points.
+  - **Recursive Tree Growth**
+    - Select random starting points from the surface grid.
+    - Use a recursive function to grow fractal tree structures from each point.
+  - **Create Tessellation Mesh**
+    - Define triangular faces using the grid points.
+    - Generate a tessellated mesh for the canopy structure.
+  - **Outputs**
+    - `tessellation_mesh`: The tessellated canopy surface.
+    - `lines`: The recursive tree structures.
 
 2. **Functions**
 
-   - **`generate_depth_map(surface, control_value)`**
-     - *Purpose*: Modify the input surface to create depth variations.
-     - *Implementation Details*:
-       - Use mathematical functions to adjust control points.
-       - Explore different methods for depth manipulation.
+- **`depth_map(x, y)`**
+  - *Purpose*: Calculate depth variation using a sine pattern.
+  - *Implementation Details*:
+    - Compute depth using `2 * sin(2πx) * cos(2πy)`.
+    - Return the depth value.
 
-   - **`tessellate_surface(surface, strategy)`**
-     - *Purpose*: Tessellate the surface based on the chosen strategy.
-     - *Implementation Details*:
-       - Implement grid-based, triangular, Voronoi, or other tessellation algorithms.
-       - Ensure non-uniformity in the tessellation pattern.
+- **`grow(pt, vec, length, g)`**
+  - *Purpose*: Recursively generate tree branches.
+  - *Implementation Details*:
+    - Stop recursion if `g` exceeds `gen`.
+    - Generate random rotation axes and angles.
+    - Compute endpoints for two branches.
+    - Add smooth curves between `pt` and each endpoint.
+    - Call `grow` for each branch endpoint with reduced `length` and incremented `g`.
 
-   - **`generate_recursive_supports(start_point, params, depth)`**
-     - *Purpose*: Generate branching structures for supports.
-     - *Implementation Details*:
-       - Use recursion to create complex geometries.
-       - Control recursion with parameters like `max_depth` and `angle`.
+2. **Execution Flow**
+
+- **Setup**
+  - Define base surface, parameters (u, v, gen, length, etc.)
+- **Generate Surface Grid**
+  - Call `depth_map` to modify Z-coordinates.
+  - Create grid, polylines, and adjusted surface.
+- **Grow Trees**
+  - Select random starting points.
+  - For each point, call `grow` recursively to create fractal trees.
+- **Tessellate and Mesh**
+  - Create triangular tessellation from the grid points.
+  - Generate a mesh representing the canopy structure.
 
 ---
 
 ## Technical Explanation
 
-*(Provide a concise explanation of your code, focusing on how you implemented depth map manipulation, recursive geometry generation, and surface tessellation in Grasshopper Python. Discuss how your approach generates the final structural canopy and the mathematical principles involved.)*
+**Depth Map Generation**
+The depth map modifies the base surface by applying sine and cosine variations to the Z-coordinate, creating a wavy, dynamic effect. The `depth_map` function computes the depth, where x and y are parametric coordinates of the surface. This wave-like pattern is controlled by the surface domain and grid resolution (`u`, `v` divisions), allowing for precise manipulation of the undulations. The mathematical principles involve trigonometric functions, which introduce periodicity.
 
-### Topics to Cover:
+**Surface Tessellation**
+The tessellation divides the depth-modified surface into a mesh of triangular faces. A grid of points is created by evaluating the surface at uniform parametric intervals and adjusting the Z-values with the depth map. For each grid cell, two triangles are defined to form a quad. This method ensures continuity across the surface and adaptability to non-uniform grids. The resulting tessellation serves as a base for integrating supports.
 
-- **Depth Map Generation**
-  - Explain how you manipulated the surface geometry.
-  - Discuss the mathematical functions used (e.g., sine, cosine).
-  - Describe how control parameters affect the depth variations.
+**Recursive Supports Generation**
+The recursive `grow` function generates tree-like support structures. Starting from selected points from the tessellated surface, branches are grown iteratively. Each branch is defined by rotating the growth vector around a randomly chosen axis within a local plane. The recursion depth (`gen`) and branch rotation angle (`angle`) control the complexity and spread of the fractal structure. This approach mimics natural branching patterns.
 
-- **Surface Tessellation**
-  - Describe the tessellation strategies implemented.
-  - Explain how tessellation contributes to the canopy design.
-  - Discuss any algorithms or techniques used for non-uniform tessellation.
-
-- **Recursive Supports Generation**
-  - Explain how recursion was used to create complex support structures.
-  - Discuss the parameters that control the recursion (e.g., depth, angle).
-  - Describe how branching patterns were achieved.
-
-- **Combining Geometries**
-  - Explain the methods used to integrate the shell and supports.
-  - Discuss any challenges in merging different geometries.
+**Combining Geometries**
+The canopy shell and recursive supports are integrated by projecting grid points onto the base surface and anchoring tree roots at selected locations. The smooth blending of tessellation and recursive geometry ensures structural continuity. Challenges include maintaining alignment and selecting anchoring points randomly.
 
 ---
 
 ## Design Variations
 
-*(Include images and descriptions of your generated design variations. For each category, provide at least three variations and discuss the differences and design decisions.)*
-
 ### Base Surface Shape Variations
 
-1. **Variation 1: [Name/Description]**
+1. **Variation 1: [Depth Map Based on Sine and Cosine Function]**
 
-   ![Canopy Variation 1](images/canopy.jpg)
-
-   - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
-
-2. **Variation 2: [Name/Description]**
-
-   ![Canopy Variation 2](images/canopy.jpg)
+   ![Canopy Variation 1](images/Canopy_Base_Surface_1.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `depth_map` function: [`2 * math.sin(2 * math.pi * x) * math.cos(2 * math.pi * y)`]
+    - `u` and `v`division: [15]
 
-3. **Variation 3: [Name/Description]**
+2. **Variation 2: [Depth Map Based on Sine Function]**
 
-   ![Canopy Variation 3](images/canopy.jpg)
+   ![Canopy Variation 2](images/Canopy_Base_Surface_2.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `depth_map` function: [`2 * math.sin(2 * math.pi * x)`]
+    - `u` and `v`division: [15]
 
-*(Repeat for Surface Tessellation Pattern and Vertical Supports.)*
+3. **Variation 3: [Depth Map Based on Cosine Function]**
+
+   ![Canopy Variation 3](images/Canopy_Base_Surface_3.png)
+
+   - **Parameters**:
+    - `depth_map` function: [`math.cos(2 * math.pi * y)`]
+    - `u` and `v`division: [15]
+
+### Surface Tessellation Pattern Variations
+
+1. **Variation 1: [Coarse Division]**
+
+   ![Canopy Variation 1](images/Canopy_Tessellation_1.png)
+
+   - **Parameters**:
+    - `u` and `v`division: [5]
+
+2. **Variation 2: [Moderate Division]**
+
+   ![Canopy Variation 2](images/Canopy_Tessellation_2.png)
+
+   - **Parameters**:
+    - `u` and `v`division: [10]
+
+3. **Variation 3: [Fine Division]**
+
+   ![Canopy Variation 3](images/Canopy_Tessellation_3.png)
+
+   - **Parameters**:
+    - `u` and `v`division: [30]
+
+### Vertical Supports Variations
+
+1. **Variation 1: [Supported by 1 L-System]**
+
+   ![Canopy Variation 1](images/Canopy_Supports_1.png)
+
+   - **Parameters**:
+    - Number of Supports: [1]
+    - `u` and `v`division: [15]
+
+2. **Variation 2: [Supported by 4 L-Systems]**
+
+   ![Canopy Variation 2](images/Canopy_Supports_2.png)
+
+   - **Parameters**:
+    - Number of Supports: [4]
+    - `u` and `v`division: [15]
+
+3. **Variation 3: [Supported by 6 L-Systems]**
+
+   ![Canopy Variation 3](images/Canopy_Supports_3.png)
+
+   - **Parameters**:
+    - Number of Supports: [6]
+    - `u` and `v`division: [15]
 
 ---
 
 ## Challenges and Solutions
 
-*(Discuss any challenges you faced during the assignment and how you overcame them.)*
+- **Challenge**: Adapting scripts to Grasshopper.
+  - **Solution**: Integrating Python-based geometry into Grasshopper's parametric workflow was initially challenging due to Grasshopper's reliance on Rhino.Geometry. To overcome this, I studied RhinoScript and utilized Grasshopper's tree structures, such as using `ghpythonlib.treehelpers.list_to_tree` to convert Python lists into data trees for tessellation and surface point manipulation
 
-### Examples:
+- **Challenge**: Managing data structures.
+  - **Solution**: Defining growth points for recursive tree structures was challenging due to misalignment between Grasshopper's data trees and Python's standard lists. Maintaining grid integrity during operations like depth mapping and tree projection was difficult. I solved this by flattening grids when needed and restructuring them with clear indexing to preserve the relationship between points and their positions.
 
-- **Challenge 1**: Adapting scripts to Grasshopper.
-  - **Solution**: Describe how you addressed this challenge, such as learning the Rhino.Geometry module or adjusting data types.
+- **Challenge**: Defining Starting Points for Tree Growth.
+  - **Solution**: Determining starting points for the tree structures was challenging. Growing trees directly from points on the tessellated mesh caused alignment issues and difficulty integrating the canopy. The solution was projecting the starting points onto the construction plane (C-plane), which provided a more structured, uniform distribution and allowed the trees to better support the canopy.
 
-- **Challenge 2**: Managing data structures.
-  - **Solution**: Explain the strategies you used to handle lists and trees in Grasshopper.
+- **Challenge**: Generating a Smooth Canopy Surface.
+  - **Solution**: The tessellated mesh from the modified grid sometimes produced sharp edges and mismatched vertices, causing visual and structural issues in the canopy. This resulted from irregular point offsets in the depth map. To fix this, I aligned grid points, interpolated between rows and columns for continuity, and added a vertical offset to create a consistent canopy shell.
 
-- **Challenge 3**: Performance optimization.
-  - **Solution**: Discuss how you optimized your code to run efficiently.
+- **Challenge**: Generating Curvy Branches
+  - **Solution**: Ensuring realistic branching patterns required balancing concave and convex shapes through control points. Inconsistent control point placement often resulted in unnatural curves. By dynamically calculating intermediate control points based on branch endpoint differences, I created smooth curves for both concave and convex branches.
 
 ---
 
 ## References
 
-*(List any resources you used or found helpful during the assignment.)*
-
-- **Python for CAD Applications**:
-  - Rhino.Python Guides
-  - RhinoScriptSyntax Documentation
-
-- **Grasshopper and GhPython**:
-  - Grasshopper Primer
-  - GhPython Tutorials
-
-- **Mathematical Functions and Recursion**:
-  - Python Math Module
-  - Recursion in Python Tutorials
-
-- **Surface Tessellation Techniques**:
-  - Voronoi Diagrams
-  - Delaunay Triangulation
+- Grasshopper Scripting: [Grasshopper Scripting: Python](https://developer.rhino3d.com/guides/scripting/scripting-gh-python/)
+- Rhino.Python: [What is Rhino.Python?](https://developer.rhino3d.com/guides/rhinopython/what-is-rhinopython/)
+- GhPython: [Mathematical Notation](https://parametrichouse.com/ghpython/)
+- NURBS-Python: [Tessellation](https://nurbs-python.readthedocs.io/en/5.x/module_tessellate.html)
 
 ---
-
-*(Feel free to expand upon these sections to fully capture your work and learning process.)*

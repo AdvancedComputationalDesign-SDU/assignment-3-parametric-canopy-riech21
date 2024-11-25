@@ -1,7 +1,7 @@
 """
 Assignment 3: Parametric Structural Canopy
 
-Author: Your Name
+Author: Rie Pilgaard Christiansen
 
 Description:
 This script generates a parametric structural canopy using depth maps and recursive geometry generation.
@@ -10,122 +10,151 @@ structural system composed of:
 - A shell/gridshell
 - A set of vertical supports
 
-The script also combines different strategies for surface tessellation to achieve a non-uniform tessellation
+The script also combines a strategy for surface tessellation to achieve a non-uniform tessellation
 of the input surface.
 
 Note: This script is intended to be used within Grasshopper's Python scripting component.
 """
 
-# Import necessary libraries
-import Rhino
-import Rhino.Geometry as rg
-import math
-import random
+# Import necessary libraries for the script
+import rhinoscriptsyntax as rs  # RhinoScript functions for geometry creation and manipulation
+import ghpythonlib.treehelpers as th  # Grasshopper utilities for handling data trees
+import math  # For mathematical operations
+import random  # For generating random values
+import Rhino.Geometry as rg  # Rhino's geometry library (Point3d, curves)
 
-# Define input parameters (These should be connected to Grasshopper inputs)
-# base_surface: The input surface for the canopy (Type: Surface)
-# depth_map_control: A numerical value controlling the depth variation (Type: Number)
-# recursion_params: A dictionary containing parameters for recursive geometry (Type: Dict)
-# tessellation_strategy: The tessellation method ('quad', 'triangular', 'voronoi') (Type: String)
-# support_points: Points where the vertical supports will be placed (Type: List of Points)
+# Define parameters for tree growth
+vec = [0, 0, 1]  # Initial growth direction vector (straight up along the Z-axis)
+lines = []  # A list to store all the branches of the tree as they are created
 
-# Example default parameters (remove when using in Grasshopper)
-# base_surface = rg.PlaneSurface(rg.Plane.WorldXY, rg.Interval(-10, 10), rg.Interval(-10, 10))
-# depth_map_control = 5.0
-# recursion_params = {
-#     'max_depth': 3,
-#     'angle': 30,
-#     'length': 5,
-#     'length_reduction': 0.7,
-#     'branches': 2,
-#     'angle_variation': 15
-# }
-# tessellation_strategy = 'quad'
-# support_points = [rg.Point3d(0, 0, 0)]
-
-def generate_depth_map(surface, control_value):
+# Recursive function to grow the fractal tree
+def grow(pt, vec, length, g):
     """
-    Modifies the input surface based on a control function to create a depth map.
+    Recursive function to grow the tree by creating branches at each depth level.
 
-    Parameters:
-    - surface: The base surface for the canopy (rg.Surface)
-    - control_value: A numerical value controlling the depth variation
+    Args:
+    pt: The starting point of the branch.
+    vec: The direction vector for growth.
+    length: The length of the branch.
+    g: The current generation (recursion depth).
+
+    """
+    if g < gen:  # Stop recursion if the current generation exceeds the maximum generation
+        # Create a local plane at the current point perpendicular to the growth direction
+        plane = rs.PlaneFromNormal(pt, vec)
+        
+        # Select a random point on the plane to define the axis of rotation
+        random_pt = rs.EvaluatePlane(plane, [random.uniform(-1, 1), random.uniform(-1, 1)])
+        rot_axis = rs.VectorCreate(random_pt, pt)  # Vector from the current point to the random point
+        
+        # Generate a rotated vector for one branch (negative angle)
+        V1 = rs.VectorRotate(vec, random.uniform(-angle, 0), rot_axis)
+        pt1 = rs.PointAdd(pt, rs.VectorScale(V1, length))  # Calculate endpoint of this branch
+        
+        # Define control points for creating a smooth curve (midpoints)
+        m1 = [pt[0], pt[1], pt[2] + (pt1[2] - pt[2]) * 0.5]  # Midpoint 1
+        m2 = [pt1[0], pt1[1], pt[2] + (pt1[2] - pt[2]) * 0.5]  # Midpoint 2
+
+        # Generate a rotated vector for the other branch (positive angle)
+        V2 = rs.VectorRotate(vec, random.uniform(0, angle), rot_axis)
+        pt2 = rs.PointAdd(pt, rs.VectorScale(V2, length))  # Calculate endpoint of the second branch
+        
+        # Define control points for the second curve
+        m3 = [pt[0], pt[1], pt[2] + (pt2[2] - pt[2]) * 0.5]  # Midpoint 3
+        m4 = [pt2[0], pt2[1], pt[2] + (pt2[2] - pt[2]) * 0.5]  # Midpoint 4
+
+        # Create curves for the two branches and add them to the lines list
+        L1 = rs.AddCurve([pt, m1, m2, pt1])  # First branch
+        L2 = rs.AddCurve([pt, m3, m4, pt2])  # Second branch
+
+        lines.append(L1)
+        lines.append(L2)
+
+        # Recursive calls to grow branches from the endpoints of the current branches
+        grow(pt1, V1, length * random.uniform(0.75, 0.95), g + 1)  # Grow from first branch endpoint
+        grow(pt2, V2, length * random.uniform(0.75, 0.95), g + 1)  # Grow from second branch endpoint
+
+# Get the U and V domains of the input surface
+srf_du = rs.SurfaceDomain(srf, 0)  # Domain of the surface in the U direction
+srf_dv = rs.SurfaceDomain(srf, 1)  # Domain of the surface in the V direction
+
+# Define a depth map function to create wave-like deformations in the Z-direction
+def depth_map(x, y):
+    """
+    Compute a wave-like depth based on a sine pattern.
+    
+    Args:
+    x, y: Coordinates within the surface domain.
 
     Returns:
-    - modified_surface: The surface after applying the depth map
+    A scalar value representing the depth at the given (x, y) position.
     """
-    # TODO: Implement depth map generation logic
-    # Potential avenues:
-    # - Use mathematical functions like sine or cosine to create undulations
-    # - Manipulate control points of the surface
-    # - Use image-based height maps for more complex variations
-    pass
+    return 2 * math.sin(2 * math.pi * x) * math.cos(2 * math.pi * y)
 
-def tessellate_surface(surface, strategy='quad'):
-    """
-    Tessellates the input surface using the specified strategy.
+# Generate a grid of points on the surface, applying depth map transformations
+srf_pts = []
+for i in range(u + 1):  # Loop through divisions in the U direction
+    row = []
+    for j in range(v + 1):  # Loop through divisions in the V direction
+        # Map grid indices to the surface's parametric domain
+        srf_u = srf_du[0] + (i / u) * (srf_du[1] - srf_du[0])
+        srf_v = srf_dv[0] + (j / v) * (srf_dv[1] - srf_dv[0])
+        
+        # Evaluate the surface to find the corresponding 3D point
+        tmp_pt = rs.EvaluateSurface(srf, srf_u, srf_v)
+        if tmp_pt:
+            # Apply the depth map to modify the Z-coordinate
+            depth = depth_map(srf_u, srf_v)
+            tmp_pt = (tmp_pt[0], tmp_pt[1], tmp_pt[2] + depth)
+            tmp_pt = rg.Point3d(tmp_pt[0], tmp_pt[1], tmp_pt[2])  # Convert to Rhino Point3d object
+        
+        row.append(tmp_pt)  # Add point to the current row
+    srf_pts.append(row)  # Add the row to the grid of points
 
-    Parameters:
-    - surface: The surface to tessellate (rg.Surface)
-    - strategy: The tessellation method ('quad', 'triangular', 'voronoi')
+# Generate polylines for visualization along the U and V directions
+u_lines = [rs.AddPolyline([pt for pt in row]) for row in srf_pts]  # Polylines along U
+v_lines = []
+for i in range(len(srf_pts[0])):  # Polylines along V
+    tmp_pts = [srf_pts[j][i] for j in range(len(srf_pts))]
+    v_lines.append(rs.AddPolyline(tmp_pts))
 
-    Returns:
-    - tessellated_mesh: A mesh representing the tessellated surface
-    """
-    # TODO: Implement tessellation logic based on the chosen strategy
-    # Potential avenues:
-    # - For 'quad', create a grid of points and connect them
-    # - For 'triangular', subdivide quads into triangles
-    # - For 'voronoi', generate seed points and create Voronoi cells
-    pass
+# Flatten the grid of points and apply a vertical offset for mesh creation
+flat_pts = [pt for row in srf_pts for pt in row]  # Flatten the 2D grid into a 1D list
+deltaZ = 10  # Vertical offset to lift points in the Z-direction
+flat_pts = [rg.Point3d(pt.X, pt.Y, pt.Z + deltaZ) for pt in flat_pts]  # Apply offset
 
-def generate_recursive_supports(start_point, params, depth=0):
-    """
-    Generates recursive geometry (e.g., fractal patterns) for vertical supports.
+# Select a subset of points from the grid to use as tree starting points
+projected_pts = [rg.Point3d(pt.X, pt.Y, 0) for pt in flat_pts]  # Project points to Z=0
+selected_pts = random.sample(projected_pts, min(4, len(projected_pts)))  # Select 4 points randomly
 
-    Parameters:
-    - start_point: The starting point for recursion (rg.Point3d)
-    - params: A dictionary containing parameters for recursion control
-    - depth: The current recursion depth
+# Grow fractal trees from the selected points
+for start_point in selected_pts:
+    # Create an initial branch for each tree
+    B = rs.PointAdd(start_point, rs.VectorScale(vec, length))  # Calculate endpoint of the branch
+    lines.append(rs.AddLine(start_point, B))  # Add the branch to the lines list
+    random.seed(s)  # Set the random seed for consistent results
+    grow(B, vec, length, 0)  # Start the recursive growth process
 
-    Returns:
-    - curves: A list of generated curves representing the supports
-    """
-    # Base case for recursion
-    if depth >= params['max_depth']:
-        return []
-    
-    # TODO: Implement recursive geometry generation logic
-    # Hints:
-    # - Calculate the direction and length of branches
-    # - Create lines or curves for each branch
-    # - Use recursion to generate sub-branches
-    pass
+# Create a new surface using the adjusted grid of points
+grid_rows, grid_cols = len(srf_pts), len(srf_pts[0])  # Number of rows and columns in the grid
+new_surface = rs.AddSrfPtGrid((grid_rows, grid_cols), flat_pts)  # Generate the surface
 
-# Main execution (This code would be inside the GhPython component)
-# Inputs from Grasshopper should be connected to the respective variables
-# base_surface, depth_map_control, recursion_params, tessellation_strategy, support_points
+# Create a tessellation mesh from the surface points
+tessellation_faces = []
+for i in range(grid_rows - 1):
+    for j in range(grid_cols - 1):
+        # Define indices for the corners of each grid cell
+        p1_idx = i * grid_cols + j
+        p2_idx = i * grid_cols + (j + 1)
+        p3_idx = (i + 1) * grid_cols + j
+        p4_idx = (i + 1) * grid_cols + (j + 1)
+        
+        # Define two triangles 
+        tessellation_faces.append([p1_idx, p2_idx, p3_idx])  # First triangle
+        tessellation_faces.append([p2_idx, p3_idx, p4_idx])  # Second triangle
 
-if base_surface and depth_map_control and recursion_params and tessellation_strategy and support_points:
-    # Generate modified surface with depth map
-    # TODO: Call generate_depth_map and assign the result to modified_surface
-    # modified_surface = generate_depth_map(base_surface, depth_map_control)
-    
-    # Tessellate the modified surface
-    # TODO: Call tessellate_surface and assign the result to canopy_mesh
-    # canopy_mesh = tessellate_surface(modified_surface, tessellation_strategy)
-    
-    # Generate vertical supports
-    supports = []
-    for pt in support_points:
-        # TODO: Call generate_recursive_supports and extend the supports list
-        # curves = generate_recursive_supports(pt, recursion_params)
-        # supports.extend(curves)
-        pass
-    
-    # Assign outputs to Grasshopper components
-    # Output variables (e.g., canopy_mesh, supports) should be connected to the component outputs
+# Create the mesh object
+tessellation_mesh = rs.AddMesh(flat_pts, tessellation_faces)
 
-else:
-    # Handle cases where inputs are not provided
-    pass
+# Convert the 2D list of surface points to a Grasshopper-compatible data tree
+srf_pts_tree = th.list_to_tree(srf_pts)
