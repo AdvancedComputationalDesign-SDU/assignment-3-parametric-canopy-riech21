@@ -92,7 +92,7 @@ The canopy shell and recursive supports are integrated by projecting grid points
 
 ### Base Surface Shape Variations
 
-1. **Variation 1: [Name/Description]**
+1. **Variation 1: [Depth Map Based on Sine and Cosine Function]**
 
    ![Canopy Variation 1](images/Canopy_Base_Surface_1.png)
 
@@ -100,7 +100,7 @@ The canopy shell and recursive supports are integrated by projecting grid points
     - `depth_map` function: [`2 * math.sin(2 * math.pi * x) * math.cos(2 * math.pi * y)`]
     - `u` and `v`division: [15]
 
-2. **Variation 2: [Name/Description]**
+2. **Variation 2: [Depth Map Based on Sine Function]**
 
    ![Canopy Variation 2](images/Canopy_Base_Surface_2.png)
 
@@ -108,7 +108,7 @@ The canopy shell and recursive supports are integrated by projecting grid points
     - `depth_map` function: [`2 * math.sin(2 * math.pi * x)`]
     - `u` and `v`division: [15]
 
-3. **Variation 3: [Name/Description]**
+3. **Variation 3: [Depth Map Based on Cosine Function]**
 
    ![Canopy Variation 3](images/Canopy_Base_Surface_3.png)
 
@@ -118,55 +118,52 @@ The canopy shell and recursive supports are integrated by projecting grid points
 
 ### Surface Tessellation Pattern Variations
 
-1. **Variation 1: [Name/Description]**
+1. **Variation 1: [Coarse Division]**
 
-   ![Canopy Variation 1](images/canopy.jpg)
-
-   - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
-
-2. **Variation 2: [U and V Division]**
-
-   ![Canopy Variation 2](images/canopy.png)
+   ![Canopy Variation 1](images/Canopy_Tessellation_1.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `u` and `v`division: [5]
 
-3. **Variation 3: [Name/Description]**
+2. **Variation 2: [Moderate Division]**
 
-   ![Canopy Variation 3](images/canopy.jpg)
+   ![Canopy Variation 2](images/Canopy_Tessellation_2.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `u` and `v`division: [10]
+
+3. **Variation 3: [Fine Division]**
+
+   ![Canopy Variation 3](images/Canopy_Tessellation_3.png)
+
+   - **Parameters**:
+    - `u` and `v`division: [30]
 
 ### Vertical Supports Variations
 
-1. **Variation 1: [Number of Supports]**
+1. **Variation 1: [Supported by 1 L-System]**
 
-   ![Canopy Variation 1](images/canopy.jpg)
-
-   - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
-
-2. **Variation 2: [Name/Description]**
-
-   ![Canopy Variation 2](images/canopy.jpg)
+   ![Canopy Variation 1](images/Canopy_Supports_1.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - Number of Supports: [1]
+    - `u` and `v`division: [15]
 
-3. **Variation 3: [Name/Description]**
+2. **Variation 2: [Supported by 4 L-Systems]**
 
-   ![Canopy Variation 3](images/canopy.jpg)
+   ![Canopy Variation 2](images/Canopy_Supports_2.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - Number of Supports: [4]
+    - `u` and `v`division: [15]
+
+3. **Variation 3: [Supported by 6 L-Systems]**
+
+   ![Canopy Variation 3](images/Canopy_Supports_3.png)
+
+   - **Parameters**:
+    - Number of Supports: [6]
+    - `u` and `v`division: [15]
 
 ---
 
