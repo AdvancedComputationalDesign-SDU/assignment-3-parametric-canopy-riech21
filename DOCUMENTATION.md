@@ -90,11 +90,61 @@ The canopy shell and recursive supports are integrated by projecting grid points
 
 ## Design Variations
 
-*(Include images and descriptions of your generated design variations. For each category, provide at least three variations and discuss the differences and design decisions.)*
-
 ### Base Surface Shape Variations
 
 1. **Variation 1: [Name/Description]**
+
+   ![Canopy Variation 1](images/Canopy_Base_Surface_1.png)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+2. **Variation 2: [Name/Description]**
+
+   ![Canopy Variation 2](images/canopy.jpg)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+3. **Variation 3: [Name/Description]**
+
+   ![Canopy Variation 3](images/canopy.jpg)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+### Surface Tessellation Pattern Variations
+
+1. **Variation 1: [Name/Description]**
+
+   ![Canopy Variation 1](images/canopy.jpg)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+2. **Variation 2: [U and V Division]**
+
+   ![Canopy Variation 2](images/canopy.png)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+3. **Variation 3: [Name/Description]**
+
+   ![Canopy Variation 3](images/canopy.jpg)
+
+   - **Parameters**:
+     - `control_value`: [Value]
+     - Other relevant parameters.
+
+### Vertical Supports Variations
+
+1. **Variation 1: [Number of Supports]**
 
    ![Canopy Variation 1](images/canopy.jpg)
 
@@ -117,8 +167,6 @@ The canopy shell and recursive supports are integrated by projecting grid points
    - **Parameters**:
      - `control_value`: [Value]
      - Other relevant parameters.
-
-*(Repeat for Surface Tessellation Pattern and Vertical Supports.)*
 
 ---
 
@@ -162,5 +210,3 @@ The canopy shell and recursive supports are integrated by projecting grid points
   - Delaunay Triangulation
 
 ---
-
-*(Feel free to expand upon these sections to fully capture your work and learning process.)*
