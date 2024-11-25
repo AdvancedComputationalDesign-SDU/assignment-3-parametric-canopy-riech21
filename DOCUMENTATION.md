@@ -97,24 +97,24 @@ The canopy shell and recursive supports are integrated by projecting grid points
    ![Canopy Variation 1](images/Canopy_Base_Surface_1.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `depth_map` function: [`2 * math.sin(2 * math.pi * x) * math.cos(2 * math.pi * y)`]
+    - `u` and `v`division: [15]
 
 2. **Variation 2: [Name/Description]**
 
-   ![Canopy Variation 2](images/canopy.jpg)
+   ![Canopy Variation 2](images/Canopy_Base_Surface_2.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `depth_map` function: [`2 * math.sin(2 * math.pi * x)`]
+    - `u` and `v`division: [15]
 
 3. **Variation 3: [Name/Description]**
 
-   ![Canopy Variation 3](images/canopy.jpg)
+   ![Canopy Variation 3](images/Canopy_Base_Surface_3.png)
 
    - **Parameters**:
-     - `control_value`: [Value]
-     - Other relevant parameters.
+    - `depth_map` function: [`math.cos(2 * math.pi * y)`]
+    - `u` and `v`division: [15]
 
 ### Surface Tessellation Pattern Variations
 
